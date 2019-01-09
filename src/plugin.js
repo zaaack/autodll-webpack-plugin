@@ -87,7 +87,7 @@ class AutoDLLPlugin {
           compiler.hooks.autodllStatsRetrieved.call(stats, source);
 
           if (source === 'memory') return;
-          memory.sync(settings.hash, stats);
+          return memory.sync(settings.hash, stats);
         })
         .then(() => {
           attachDllReferencePlugin(compiler);
