@@ -17,6 +17,20 @@ import createHandleStats from './createHandleStats';
 import createLogger from './createLogger';
 
 class AutoDLLPlugin {
+  // https://github.com/webpack/webpack/issues/12795
+  static getHooks(compiler) {
+    let hooks = AutoDLLPlugin.hooks.get(compiler);
+    if (hooks === undefined) {
+      AutoDLLPlugin.hooks.set(
+        compiler,
+        (hooks = {
+          autodllStatsRetrieved: new SyncHook(['stats', 'source']),
+        })
+      );
+    }
+    return hooks;
+  }
+
   constructor(settings) {
     // first, we store a reference to the settings passed by the user as is.
     this._originalSettings = settings;
@@ -54,7 +68,8 @@ class AutoDLLPlugin {
     const memory = createMemory();
     const handleStats = createHandleStats(log, settings.hash, memory);
 
-    compiler.hooks.autodllStatsRetrieved = new SyncHook(['stats', 'source']);
+    // compiler.hooks.autodllStatsRetrieved = new SyncHook(['stats', 'source']);
+    AutoDLLPlugin.getHooks(compiler);
 
     if (isEmpty(dllConfig.entry)) {
       // there's nothing to do.
@@ -84,7 +99,8 @@ class AutoDLLPlugin {
       compileIfNeeded(() => webpack(dllConfig))
         .then(stats => handleStats(stats))
         .then(({ source, stats }) => {
-          compiler.hooks.autodllStatsRetrieved.call(stats, source);
+          // compiler.hooks.autodllStatsRetrieved.call(stats, source);
+          AutoDLLPlugin.getHooks(compiler).autodllStatsRetrieved.call(stats, source);
 
           if (source === 'memory') return;
           memory.sync(settings.hash, stats);
@@ -148,5 +164,6 @@ class AutoDLLPlugin {
     }
   }
 }
+AutoDLLPlugin.hooks = new WeakMap();
 
 export default AutoDLLPlugin;

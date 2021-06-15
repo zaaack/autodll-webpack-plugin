@@ -1,35 +1,36 @@
-[![Build Status for Linux](https://travis-ci.org/asfktz/autodll-webpack-plugin.svg?branch=master)](https://travis-ci.org/asfktz/autodll-webpack-plugin)
-[![Build Status for Windows](https://ci.appveyor.com/api/projects/status/github/asfktz/autodll-webpack-plugin?branch=master&svg=true)](https://ci.appveyor.com/project/asfktz/autodll-webpack-plugin)
+[![Build Status for Linux](https://travis-ci.org/zaaack/autodll-webpack-plugin.svg?branch=master)](https://travis-ci.org/zaaack/autodll-webpack-plugin)
+[![Build Status for Windows](https://ci.appveyor.com/api/projects/status/github/zaaack/autodll-webpack-plugin?branch=master&svg=true)](https://ci.appveyor.com/project/zaaack/autodll-webpack-plugin)
 [![Downloads](https://img.shields.io/npm/dm/autodll-webpack-plugin.svg)](https://www.npmjs.com/package/autodll-webpack-plugin)
-[![Join the chat at https://gitter.im/autodll-webpack-plugin/Lobby](https://badges.gitter.im/autodll-webpack-plugin/Lobby.svg)](https://gitter.im/autodll-webpack-plugin/Lobby?utm_source=badge&utm_medium=badge&utm_campaign=pr-badge&utm_content=badge)
-
 
 # Important Note
 
+~~Now, that webpack 5 planning to [support caching out-of-the-box](https://github.com/webpack/webpack/issues/6527),
+AutoDllPlugin will soon be obsolete.~~
 
-Now, that webpack 5 planning to [support caching out-of-the-box](https://github.com/webpack/webpack/issues/6527),
-AutoDllPlugin will soon be obsolete.
+
+** A webpack5 fork for autodll-webpack-plugin  **
+
 
 In the meantime, I would like to recommend Michael Goddard's [hard-source-webpack-plugin](https://github.com/mzgoddard/hard-source-webpack-plugin), <br>
 which seems like webpack 5 is going to use internally.
 
-
 <hr>
 
-
 # AutoDllPlugin
+
 Webpack's DllPlugin without the boilerplate
 
-webpack 4
+webpack 4/5
+
 ```
-  npm install --save-dev autodll-webpack-plugin
+  npm install --save-dev @zaaack/
 ```
 
 webpack 2 / 3
+
 ```
   npm install --save-dev autodll-webpack-plugin@0.3
 ```
-
 
 ---
 
@@ -39,7 +40,6 @@ webpack 2 / 3
 - [Options](#options)
 - [FAQ](#faq)
 - [Examples](#running-examples)
-
 
 ## Introduction
 
@@ -53,12 +53,11 @@ That leads to a dramatic reduction in the amount of time takes Webpack to build 
 
 For example, these are the measurements for the  [performance test](examples/performance) that you can find in the [examples](examples) folder:
 
-|                   |  **Without DllPlugin**  | **With DllPlugin** |
-|-------------------|-------------------|-----------------------|
-| **Build Time** | 16461ms - 17310ms | 2991ms - 3505ms |
-| **DevServer Rebuild** | 2924ms - 2997ms | 316ms - 369ms |
 
-
+|                       | **Without DllPlugin** | **With DllPlugin** |
+| ----------------------- | ----------------------- | -------------------- |
+| **Build Time**        | 16461ms - 17310ms     | 2991ms - 3505ms    |
+| **DevServer Rebuild** | 2924ms - 2997ms       | 316ms - 369ms      |
 
 ### The DllPlugin sounds great! So why AutoDllPlugin?
 
@@ -98,6 +97,7 @@ plugins: [
 ```
 
 Will Result in:
+
 ```html
 <!DOCTYPE html>
 <html lang="en">
@@ -114,7 +114,6 @@ Will Result in:
 </body>
 </html>
 ```
-
 
 ### Basic Usage ([example](examples/basic)):
 
@@ -266,78 +265,6 @@ module.exports = {
 }
 </pre>
 
-<p>If your webpack config is stored in a nested directory:</p>
-<p><i>~/my-project/<b>config</b>/webpack.config.js</i></p>
-<p>It should look like this:</p>
-<pre>
-{
-  context: path.join(__dirname, '..')
-}
-</pre>
-          </td>
-        </tr>
-        <tr>
-            <td>inject</td>
-            <td>Boolean</td>
-            <td><code>false</code></td>
-            <td>
-              <p>By setting inject to true, AutoDLL will inject the DLL bundles into the HTML for you.</p>
-              <p>
-                <b>Note:</b> <a href="https://github.com/jantimon/html-webpack-plugin">HtmlWebpackPlugin</a>
-                is required for this feature to work.
-              </p>
-            </td>
-        </tr>
-        <tr>
-            <td>path</td>
-            <td>String</td>
-            <td><code>""</code></td>
-            <td>
-                The path for the DLL bundles, relative to webpack's
-                <a href="https://webpack.js.org/configuration/output/#output-publicpath">output.publicPath</a>
-            </td>
-        </tr>
-        <tr>
-            <td>debug</td>
-            <td>Boolean</td>
-            <td><code>false</code></td>
-            <td>Use debug mode to see more clearly what AutoDLL is doing.</td>
-        </tr>
-        <tr>
-            <td>plugins</td>
-            <td>Array</td>
-            <td><code>[]</code></td>
-            <td>
-              <p>
-                Plugins for the DLL compiler. Same as webpack's
-                <a href="https://webpack.js.org/configuration/plugins/">plugins</a>.
-              </p>
-              <pre>plugins: [
-  new webpack.optimize.UglifyJsPlugin()
-]</pre>
-            </td>
-        </tr>
-        <tr>
-          <td>inherit</td>
-          <td>Boolean/Function</td>
-          <td><code>false</code></td>
-          <td>
-            Inherit from the parent config.
-            A valid use-case would be if you have <code>devtool: "source-maps"</code> in your webpack config and wanted source maps to be created for the DLL bundle as well.
-            However, this <strong>does not</strong> inherit plugins from the parent config and inheriting loaders are buggy too(see <a href="https://github.com/asfktz/autodll-webpack-plugin/issues/37">#37</a>).
-            It can also be a function to inherit only the desired properties.
-            <pre>function inherit(webpackConfig) {
-  // Return object with desired properties.
-}
-</pre>
-            To see it action, <a href="https://github.com/asfktz/autodll-webpack-plugin/tree/master/experiments/inherit">check out the example</a>.
-            <br>
-            <strong>⚠️ This option is highly experimental! Use with caution and if you face any problems, please open a issue.<strong>
-          </td>
-        </tr>
-    </tbody>
-</table>
-
 ## FAQ
 
 ### I added my dependencies to the DLL, and now, when I make a change to one of them I don't see it! Why?
@@ -347,6 +274,7 @@ When you run webpack for the first time, AutoDLL builds the DLL bundles and stor
 That leads to faster builds and rebuilds (using webpack's dev server).
 
 There are two conditions for triggering a new build on the next run:
+
 1. Running `npm install / remove / update package-name` (or Yarn equivalent).
 2. Changing the plugin's configurations.
 
@@ -385,7 +313,6 @@ new AutoDllPlugin({
   }
 })
 ```
-
 
 ### The modules I added to the DLL are duplicated! They included both in the DLL bundle AND the main bundle.
 
@@ -472,7 +399,7 @@ If you still encounter an issue with the context set up correctly, please open a
 
 ## Running Examples
 
-1. `git clone git@github.com:asfktz/autodll-webpack-plugin.git`
+1. `git clone git@github.com:zaaack/autodll-webpack-plugin.git`
 2. `cd autodll-webpack-plugin`
 3. `npm install`
 4. `npm run build`
@@ -483,13 +410,17 @@ If you still encounter an issue with the context set up correctly, please open a
 ## Contributors
 
 <!-- ALL-CONTRIBUTORS-LIST:START - Do not remove or modify this section -->
+
 <!-- prettier-ignore -->
-| [<img src="https://avatars1.githubusercontent.com/u/199747?v=4" width="100px;"/><br /><sub><b>Asaf Katz</b></sub>](https://twitter.com/asfktz)<br />[💻](https://github.com/asfktz/autodll-webpack-plugin/commits?author=asfktz "Code") [👀](#review-asfktz "Reviewed Pull Requests") [⚠️](https://github.com/asfktz/autodll-webpack-plugin/commits?author=asfktz "Tests") [🚇](#infra-asfktz "Infrastructure (Hosting, Build-Tools, etc)") | [<img src="https://avatars2.githubusercontent.com/u/22251956?v=4" width="100px;"/><br /><sub><b>Suhas Karanth</b></sub>](https://github.com/sudo-suhas)<br />[💻](https://github.com/asfktz/autodll-webpack-plugin/commits?author=sudo-suhas "Code") [🤔](#ideas-sudo-suhas "Ideas, Planning, & Feedback") [🐛](https://github.com/asfktz/autodll-webpack-plugin/issues?q=author%3Asudo-suhas "Bug reports") [🚇](#infra-sudo-suhas "Infrastructure (Hosting, Build-Tools, etc)") [⚠️](https://github.com/asfktz/autodll-webpack-plugin/commits?author=sudo-suhas "Tests") [🔧](#tool-sudo-suhas "Tools") [💬](#question-sudo-suhas "Answering Questions") | [<img src="https://avatars1.githubusercontent.com/u/17503914?v=4" width="100px;"/><br /><sub><b>Matt Heise</b></sub>](https://github.com/mhheise)<br />[💻](https://github.com/asfktz/autodll-webpack-plugin/commits?author=mhheise "Code") | [<img src="https://avatars0.githubusercontent.com/u/154732?v=4" width="100px;"/><br /><sub><b>James Gillmore</b></sub>](http://twitter.com/faceyspacey)<br />[💻](https://github.com/asfktz/autodll-webpack-plugin/commits?author=faceyspacey "Code") | [<img src="https://avatars1.githubusercontent.com/u/583657?v=4" width="100px;"/><br /><sub><b>Jonas Pauthier</b></sub>](https://twitter.com/jonas_pauthier)<br />[🤔](#ideas-Nargonath "Ideas, Planning, & Feedback") [🔧](#tool-Nargonath "Tools") [💬](#question-Nargonath "Answering Questions") [📖](https://github.com/asfktz/autodll-webpack-plugin/commits?author=Nargonath "Documentation") [🐛](https://github.com/asfktz/autodll-webpack-plugin/issues?q=author%3ANargonath "Bug reports") | [<img src="https://avatars1.githubusercontent.com/u/9636410?v=4" width="100px;"/><br /><sub><b>Ade Viankakrisna Fadlil</b></sub>](https://github.com/viankakrisna)<br />[💻](https://github.com/asfktz/autodll-webpack-plugin/commits?author=viankakrisna "Code") [🐛](https://github.com/asfktz/autodll-webpack-plugin/issues?q=author%3Aviankakrisna "Bug reports") [🔧](#tool-viankakrisna "Tools") [💬](#question-viankakrisna "Answering Questions") | [<img src="https://avatars2.githubusercontent.com/u/2373958?v=4" width="100px;"/><br /><sub><b>Tryggvi Gylfason</b></sub>](https://github.com/tryggvigy)<br />[💻](https://github.com/asfktz/autodll-webpack-plugin/commits?author=tryggvigy "Code") [💬](#question-tryggvigy "Answering Questions") [🐛](https://github.com/asfktz/autodll-webpack-plugin/issues?q=author%3Atryggvigy "Bug reports") |
-| :---: | :---: | :---: | :---: | :---: | :---: | :---: |
-| [<img src="https://avatars1.githubusercontent.com/u/1056587?v=4" width="100px;"/><br /><sub><b>Drew Hamlett</b></sub>](https://github.com/drewhamlett)<br />[💻](https://github.com/asfktz/autodll-webpack-plugin/commits?author=drewhamlett "Code") | [<img src="https://avatars1.githubusercontent.com/u/8420490?v=4" width="100px;"/><br /><sub><b>Joshua Wiens</b></sub>](https://github.com/d3viant0ne)<br />[📖](https://github.com/asfktz/autodll-webpack-plugin/commits?author=d3viant0ne "Documentation") [💬](#question-d3viant0ne "Answering Questions") | [<img src="https://avatars2.githubusercontent.com/u/231804?v=4" width="100px;"/><br /><sub><b>Daniel Tschinder</b></sub>](https://github.com/danez)<br />[💻](https://github.com/asfktz/autodll-webpack-plugin/commits?author=danez "Code") | [<img src="https://avatars1.githubusercontent.com/u/6374832?v=4" width="100px;"/><br /><sub><b>Amila Welihinda</b></sub>](http://amilajack.com)<br />[📖](https://github.com/asfktz/autodll-webpack-plugin/commits?author=amilajack "Documentation") |
+
+
+| [<img src="https://avatars1.githubusercontent.com/u/199747?v=4" width="100px;"/><br /><sub><b>Asaf Katz</b></sub>](https://twitter.com/zaaack)<br />[💻](https://github.com/zaaack/autodll-webpack-plugin/commits?author=zaaack "Code") [👀](#review-zaaack "Reviewed Pull Requests") [⚠️](https://github.com/zaaack/autodll-webpack-plugin/commits?author=zaaack "Tests") [🚇](#infra-zaaack "Infrastructure (Hosting, Build-Tools, etc)") | [<img src="https://avatars2.githubusercontent.com/u/22251956?v=4" width="100px;"/><br /><sub><b>Suhas Karanth</b></sub>](https://github.com/sudo-suhas)<br />[💻](https://github.com/zaaack/autodll-webpack-plugin/commits?author=sudo-suhas "Code") [🤔](#ideas-sudo-suhas "Ideas, Planning, & Feedback") [🐛](https://github.com/zaaack/autodll-webpack-plugin/issues?q=author%3Asudo-suhas "Bug reports") [🚇](#infra-sudo-suhas "Infrastructure (Hosting, Build-Tools, etc)") [⚠️](https://github.com/zaaack/autodll-webpack-plugin/commits?author=sudo-suhas "Tests") [🔧](#tool-sudo-suhas "Tools") [💬](#question-sudo-suhas "Answering Questions") | [<img src="https://avatars1.githubusercontent.com/u/17503914?v=4" width="100px;"/><br /><sub><b>Matt Heise</b></sub>](https://github.com/mhheise)<br />[💻](https://github.com/zaaack/autodll-webpack-plugin/commits?author=mhheise "Code") | [<img src="https://avatars0.githubusercontent.com/u/154732?v=4" width="100px;"/><br /><sub><b>James Gillmore</b></sub>](http://twitter.com/faceyspacey)<br />[💻](https://github.com/zaaack/autodll-webpack-plugin/commits?author=faceyspacey "Code") | [<img src="https://avatars1.githubusercontent.com/u/583657?v=4" width="100px;"/><br /><sub><b>Jonas Pauthier</b></sub>](https://twitter.com/jonas_pauthier)<br />[🤔](#ideas-Nargonath "Ideas, Planning, & Feedback") [🔧](#tool-Nargonath "Tools") [💬](#question-Nargonath "Answering Questions") [📖](https://github.com/zaaack/autodll-webpack-plugin/commits?author=Nargonath "Documentation") [🐛](https://github.com/zaaack/autodll-webpack-plugin/issues?q=author%3ANargonath "Bug reports") | [<img src="https://avatars1.githubusercontent.com/u/9636410?v=4" width="100px;"/><br /><sub><b>Ade Viankakrisna Fadlil</b></sub>](https://github.com/viankakrisna)<br />[💻](https://github.com/zaaack/autodll-webpack-plugin/commits?author=viankakrisna "Code") [🐛](https://github.com/zaaack/autodll-webpack-plugin/issues?q=author%3Aviankakrisna "Bug reports") [🔧](#tool-viankakrisna "Tools") [💬](#question-viankakrisna "Answering Questions") | [<img src="https://avatars2.githubusercontent.com/u/2373958?v=4" width="100px;"/><br /><sub><b>Tryggvi Gylfason</b></sub>](https://github.com/tryggvigy)<br />[💻](https://github.com/zaaack/autodll-webpack-plugin/commits?author=tryggvigy "Code") [💬](#question-tryggvigy "Answering Questions") [🐛](https://github.com/zaaack/autodll-webpack-plugin/issues?q=author%3Atryggvigy "Bug reports") |
+| :---------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------: | :------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------: | :-------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------: | :-----------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------: | :----------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------: | :---------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------: | :-----------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------: |
+|                                                                                             [<img src="https://avatars1.githubusercontent.com/u/1056587?v=4" width="100px;"/><br /><sub><b>Drew Hamlett</b></sub>](https://github.com/drewhamlett)<br />[💻](https://github.com/zaaack/autodll-webpack-plugin/commits?author=drewhamlett "Code")                                                                                             |                                                                                                                                                                         [<img src="https://avatars1.githubusercontent.com/u/8420490?v=4" width="100px;"/><br /><sub><b>Joshua Wiens</b></sub>](https://github.com/d3viant0ne)<br />[📖](https://github.com/zaaack/autodll-webpack-plugin/commits?author=d3viant0ne "Documentation") [💬](#question-d3viant0ne "Answering Questions")                                                                                                                                                                         | [<img src="https://avatars2.githubusercontent.com/u/231804?v=4" width="100px;"/><br /><sub><b>Daniel Tschinder</b></sub>](https://github.com/danez)<br />[💻](https://github.com/zaaack/autodll-webpack-plugin/commits?author=danez "Code") | [<img src="https://avatars1.githubusercontent.com/u/6374832?v=4" width="100px;"/><br /><sub><b>Amila Welihinda</b></sub>](http://amilajack.com)<br />[📖](https://github.com/zaaack/autodll-webpack-plugin/commits?author=amilajack "Documentation") |                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                     |                                                                                                                                                                                                                                                                                                                                                                                                                                                           |                                                                                                                                                                                                                                                                                                                                                                                                       |
+
 <!-- ALL-CONTRIBUTORS-LIST:END -->
+
 This project follows the [all-contributors](https://github.com/kentcdodds/all-contributors) specification. Contributions of any kind welcome!
 
 Special thanks to all the contributors over the time.
 Every one of you made an impact ❤️
-

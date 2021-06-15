@@ -11,6 +11,7 @@ const {
   createPkgHandler,
   createMakeChange,
 } = require('../../../helpers/integration');
+const { default: AutoDLLPlugin } = require('../../../../lib/plugin.js');
 
 const runner = createRunner(webpack, WebpackDevServer);
 
@@ -39,7 +40,7 @@ test.serial('Detect package.json change', async t => {
   // But the cache also invalidates when the settings passed to the plugin are different.
 
   await runner(config, ({ done, compiler }) => {
-    compiler.hooks.autodllStatsRetrieved.tap(
+    AutoDLLPlugin.getHooks(compiler).autodllStatsRetrieved.tap(
       'test',
       routeCalls(
         () => {

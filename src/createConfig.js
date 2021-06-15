@@ -1,4 +1,4 @@
-import { strategy } from 'webpack-merge';
+import { mergeWithCustomize, mergeWithRules } from 'webpack-merge';
 import { DllPlugin } from 'webpack';
 import path from 'path';
 import { cacheDir } from './paths';
@@ -9,7 +9,7 @@ import omit from 'lodash/omit';
 
 import mapParentConfig from './mapParentConfig';
 
-const webpackMerge = strategy({
+const webpackMerge = mergeWithRules({
   entry: 'append',
   output: 'append',
   plugins: 'append',
@@ -43,12 +43,12 @@ export const _createConfig = cacheDir => (settings, rawParentConfig) => {
       ...(settings.plugins || []),
       new DllPlugin({
         path: path.join(outputPath, '[name].manifest.json'),
-        name: '[name]_[chunkhash]',
+        name: '[name]_[fullhash]',
       }),
     ],
     output: {
       filename: filename,
-      library: '[name]_[chunkhash]',
+      library: '[name]_[fullhash]',
     },
   };
 

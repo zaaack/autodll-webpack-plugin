@@ -1,1 +1,1 @@
-module.exports = 'initial';
+module.exports = 'some other change';

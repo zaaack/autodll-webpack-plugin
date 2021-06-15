@@ -10,6 +10,7 @@ const {
   createClearCache,
   createMakeChange,
 } = require('../../../helpers/integration');
+const { default: AutoDLLPlugin } = require('../../../../lib/plugin.js');
 
 const runner = createRunner(webpack, WebpackDevServer);
 
@@ -25,8 +26,8 @@ test.serial('Ensure stats retrieved from the currect source', async t => {
   console.log('clean run (cache deleted)');
 
   await runner(config, ({ done, compiler }) => {
-    compiler.hooks.autodllStatsRetrieved = new SyncHook(['stats', 'source']);
-    compiler.hooks.autodllStatsRetrieved.call(
+    AutoDLLPlugin.getHooks(compiler).autodllStatsRetrieved = new SyncHook(['stats', 'source']);
+    AutoDLLPlugin.getHooks(compiler).autodllStatsRetrieved.call(
       routeCalls(
         (stats, source) => {
           t.is(source, 'build', 'should retreive stats from build');
@@ -39,7 +40,10 @@ test.serial('Ensure stats retrieved from the currect source', async t => {
 
     compiler.hooks.done.tap(
       'AutoDllPlugin',
-      routeCalls(() => makeChange('some change'), () => done())
+      routeCalls(
+        () => makeChange('some change'),
+        () => done()
+      )
     );
   });
 
@@ -47,7 +51,7 @@ test.serial('Ensure stats retrieved from the currect source', async t => {
 
   await runner(config, ({ done, compiler }) => {
     // compiler.hooks.autodllStatsRetrieved = new SyncHook(['stats', 'source']);
-    compiler.hooks.autodllStatsRetrieved.tap(
+    AutoDLLPlugin.getHooks(compiler).autodllStatsRetrieved.tap(
       'test',
       routeCalls(
         (stats, source) => {
@@ -61,7 +65,10 @@ test.serial('Ensure stats retrieved from the currect source', async t => {
 
     compiler.hooks.done.tap(
       'AutoDllPlugin',
-      routeCalls(() => makeChange('some other change'), () => done())
+      routeCalls(
+        () => makeChange('some other change'),
+        () => done()
+      )
     );
   });
 });
