@@ -112,7 +112,7 @@ class AutoDLLPlugin {
         .catch(console.error);
     };
 
-    const emit = (compilation, callback) => {
+    const emit = compilation => {
       const dllAssets = memory.getAssets().reduce((assets, { filename, buffer }) => {
         const assetPath = path.join(settings.path, filename);
 
@@ -123,15 +123,26 @@ class AutoDLLPlugin {
       }, {});
 
       compilation.assets = { ...compilation.assets, ...dllAssets };
-
-      callback();
     };
 
     compiler.hooks.beforeCompile.tapAsync('AutoDllPlugin', beforeCompile);
     compiler.hooks.run.tapAsync('AutoDllPlugin', watchRun);
     compiler.hooks.watchRun.tapAsync('AutoDllPlugin', watchRun);
-    compiler.hooks.emit.tapAsync('AutoDllPlugin', emit);
+    // compiler.hooks.emit.tapAsync('AutoDllPlugin', emit);
 
+    compiler.hooks.thisCompilation.tap('AutoDllPlugin', compilation => {
+      const { sources, Compilation } = require('webpack');
+      compilation.hooks.processAssets.tap(
+        {
+          name: 'AutoDllPlugin',
+          // https://github.com/webpack/webpack/blob/master/lib/Compilation.js#L3280
+          stage: Compilation.PROCESS_ASSETS_STAGE_REPORT,
+        },
+        () => {
+          emit(compilation);
+        }
+      );
+    });
     if (inject) {
       const getDllEntriesPaths = extension =>
         flatMap(memory.getStats().entrypoints, 'assets')
